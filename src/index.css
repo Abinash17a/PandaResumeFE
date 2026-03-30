@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/* Print styles for PDF generation */
+@media print {
+  /* Prevent content from being cut off across page breaks */
+  .break-inside-avoid-page {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+  
+  /* Ensure sections don't get split */
+  section {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+  
+  /* Prevent individual items from breaking */
+  .break-inside-avoid-page > * {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+  
+  /* Better page breaks for lists */
+  ul, ol {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+  
+  li {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+  
+  /* Ensure headers stay with their content */
+  h2, h3, h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+  
+  /* Main resume container */
+  #resume-preview {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+  
+  /* Remove unnecessary elements from print */
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Additional print-specific styles */
+.print\:break-inside-avoid {
+  break-inside: avoid-page;
+  page-break-inside: avoid;
+}
+
+.print\:break-after-avoid {
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.print\:break-before-avoid {
+  break-before: avoid;
+  page-break-before: avoid;
+}
