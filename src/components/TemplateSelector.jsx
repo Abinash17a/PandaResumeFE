@@ -15,8 +15,7 @@ export default function TemplateSelector({ setTemplate }) {
 
   const templates = [
     { id: 'template1', name: 'Classic', description: 'Clean, structured layout perfect for traditional roles', color: 'indigo' },
-    { id: 'template2', name: 'Modern', description: 'Contemporary design with bold typography', color: 'teal' },
-    { id: 'template3', name: 'Minimal', description: 'Sleek and elegant with minimal aesthetics', color: 'rose' }
+    { id: 'template2', name: 'Modern', description: 'Contemporary design with bold typography', color: 'teal' }
   ];
 
   const handleTemplateSelect = (templateId) => {

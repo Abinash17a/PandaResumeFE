@@ -210,13 +210,13 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
       id="resume-preview"
       role="document"
       style={containerStyle}
-      className={`w-full max-w-[900px] mx-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-3 sm:py-4 md:py-5 lg:py-6 ${lineHeight} ${letterSpacing} text-gray-800 print:px-6 print:py-4 print:max-w-none print:shadow-none print:rounded-none`}
+      className={`w-full max-w-4xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-3 sm:py-4 md:py-5 lg:py-6 ${lineHeight} ${letterSpacing} text-gray-800 print:px-6 print:py-4 print:max-w-none print:shadow-none print:rounded-none`}
     >
       {/* ATS-friendly hidden content */}
       <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }} aria-hidden="true">
         <h1>{data.name || "CHARLES BLOOMBERG"}</h1>
         <h2>Professional Summary</h2>
-        <p>{data.summary}</p>
+        <p dangerouslySetInnerHTML={{ __html: data.summary }}></p>
         <h2>Work Experience</h2>
         {experienceList.map((exp, i) => (
           <div key={`ats-exp-${i}`}>
@@ -225,7 +225,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
             <p>{exp.location}</p>
             <p>{exp.startDate} - {exp.endDate}</p>
             {exp.bullets && exp.bullets.map((bullet, j) => (
-              <p key={`ats-exp-${i}-${j}`}>{bullet}</p>
+              <p key={`ats-exp-${i}-${j}`} dangerouslySetInnerHTML={{ __html: bullet }}></p>
             ))}
           </div>
         ))}
@@ -237,7 +237,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
             <p>{edu.location}</p>
             <p>{edu.startDate} - {edu.endDate}</p>
             {edu.notes && edu.notes.map((note, j) => (
-              <p key={`ats-edu-${idx}-${j}`}>{note}</p>
+              <p key={`ats-edu-${idx}-${j}`} dangerouslySetInnerHTML={{ __html: note }}></p>
             ))}
           </div>
         ))}
@@ -322,8 +322,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
               {exp.bullets && exp.bullets.length > 0 && (
                 <ul style={bulletListStyle}>
                   {exp.bullets.map((bullet, j) => (
-                    <li key={`exp-${i}-${j}`} style={bulletItemStyle}>
-                      {bullet}
+                    <li key={`exp-${i}-${j}`} style={bulletItemStyle} dangerouslySetInnerHTML={{ __html: bullet }}>
                     </li>
                   ))}
                 </ul>
@@ -343,8 +342,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
               {project.bullets.length > 0 && (
                 <ul style={bulletListStyle}>
                   {project.bullets.map((bullet, j) => (
-                    <li key={`project-${i}-${j}`} style={bulletItemStyle}>
-                      {bullet}
+                    <li key={`project-${i}-${j}`} style={bulletItemStyle} dangerouslySetInnerHTML={{ __html: bullet }}>
                     </li>
                   ))}
                 </ul>
@@ -385,8 +383,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
               {edu.notes && edu.notes.length > 0 && (
                 <ul style={bulletListStyle}>
                   {edu.notes.map((note, j) => (
-                    <li key={`edu-${idx}-${j}`} style={bulletItemStyle}>
-                      {note}
+                    <li key={`edu-${idx}-${j}`} style={bulletItemStyle} dangerouslySetInnerHTML={{ __html: note }}>
                     </li>
                   ))}
                 </ul>

@@ -306,12 +306,11 @@ export default function AdditionalSections() {
           
           <div className="mb-6">
             <InputLabel>Project Description</InputLabel>
-            <textarea
+            <RichTextEditor
+              value={currentProject.description || ""}
+              onChange={(value) => setCurrentProject({...currentProject, description: value})}
               placeholder="Describe your project and its impact..."
-              value={currentProject.description}
-              onChange={(e) => setCurrentProject({...currentProject, description: e.target.value})}
               rows="4"
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm transition-all focus:ring-2 focus:ring-purple-500/10 focus:border-purple-500 outline-none resize-none"
             />
           </div>
           
@@ -347,7 +346,7 @@ export default function AdditionalSections() {
                       {proj.startDate} — {proj.endDate}
                     </p>
                     {proj.description && (
-                      <p className="text-sm text-gray-600 mt-3 leading-relaxed">{proj.description}</p>
+                      <div className="text-sm text-gray-600 mt-3 leading-relaxed" dangerouslySetInnerHTML={{ __html: proj.description }} />
                     )}
                     {proj.technologies && (
                       <p className="text-sm font-semibold text-purple-600 mt-2">

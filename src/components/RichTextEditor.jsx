@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bold, Italic, Underline, List, ListOrdered, Type } from 'lucide-react';
+import { Bold, Italic, Underline, List, Type } from 'lucide-react';
 
 const RichTextEditor = ({ 
   value = '', 
@@ -125,9 +125,18 @@ const RichTextEditor = ({
     }
   };
 
-  const insertList = (ordered = false) => {
-    const command = ordered ? 'insertOrderedList' : 'insertUnorderedList';
-    execCommand(command);
+  const insertBullet = () => {
+    if (!editorRef.current) return;
+    
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      // Insert bullet point as text
+      document.execCommand('insertText', false, '• ');
+      
+      // Focus back to editor
+      editorRef.current.focus();
+      handleChange();
+    }
   };
 
   const clearFormatting = () => {
@@ -189,21 +198,11 @@ const RichTextEditor = ({
           {/* Bullet List */}
           <button
             type="button"
-            onClick={() => insertList(false)}
+            onClick={insertBullet}
             className="p-2 rounded hover:bg-gray-200 text-gray-600 transition-colors"
-            title="Bullet List"
+            title="Bullet Point"
           >
             <List size={16} />
-          </button>
-
-          {/* Numbered List */}
-          <button
-            type="button"
-            onClick={() => insertList(true)}
-            className="p-2 rounded hover:bg-gray-200 text-gray-600 transition-colors"
-            title="Numbered List"
-          >
-            <ListOrdered size={16} />
           </button>
         </div>
 

@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import { Monitor, Type, FileText, AlertCircle, Target } from "lucide-react"; // Optional: Install lucide-react for icons
 import Template1 from "../templates/template1";
 import Template2 from "../templates/template2";
-import Template3 from "../templates/template3";
 import ATSModal from "./ATSModal";
 
 export default function Preview({
@@ -15,6 +14,12 @@ export default function Preview({
   
   const [showATSModal, setShowATSModal] = useState(false);
 
+  // Helper function to strip HTML tags
+  const stripHtml = (html) => {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+  };
+
   // Memoize formatting to optimize performance during live typing
   const formattedData = useMemo(() => {
     if (!data) return null;
@@ -26,12 +31,15 @@ export default function Preview({
 
     return {
       ...data,
+      
+      summary: data.summary || "",
+      
       experience: data.experiences?.map(exp => 
-        `${exp.title} at ${exp.company}${formatRange(exp.startDate, exp.endDate, exp.current)}\n${exp.description || ''}`
+        `${exp.title} at ${exp.company}${formatRange(exp.startDate, exp.endDate, exp.current)}\n${stripHtml(exp.description || '')}`
       ).join('\n\n') || "",
       
       education: data.educationItems?.map(edu => 
-        `${edu.degree}, ${edu.school}${formatRange(edu.startDate, edu.endDate, edu.current)}${edu.gpa ? `\nGPA: ${edu.gpa}` : ''}${edu.notes ? `\n${edu.notes}` : ''}`
+        `${edu.degree}, ${edu.school}${formatRange(edu.startDate, edu.endDate, edu.current)}${edu.gpa ? `\nGPA: ${edu.gpa}` : ''}${edu.notes ? `\n${stripHtml(edu.notes)}` : ''}`
       ).join('\n\n') || "",
       
       skills: [...(data.technicalSkills || []), ...(data.nonTechnicalSkills || [])].join(', '),
@@ -41,7 +49,7 @@ export default function Preview({
       ).join('\n') || "",
       
       projects: data.projects?.map(proj => 
-        `${proj.title}\n${proj.description}${proj.technologies ? `\nTechnologies: ${proj.technologies}` : ''}${proj.link ? `\nLink: ${proj.link}` : ''}`
+        `${proj.title}\n${stripHtml(proj.description || '')}${proj.technologies ? `\nTechnologies: ${proj.technologies}` : ''}${proj.link ? `\nLink: ${proj.link}` : ''}`
       ).join('\n\n') || "",
       
       achievements: data.achievements?.join('\n\n') || "",
@@ -112,7 +120,6 @@ export default function Preview({
     const templates = {
       template1: <Template1 data={formattedData} fontSizeConfig={fontSizeConfig} />,
       template2: <Template2 data={formattedData} fontSizeConfig={fontSizeConfig} />,
-      template3: <Template3 data={formattedData} fontSizeConfig={fontSizeConfig} />,
     };
 
     if (templates[template]) {
