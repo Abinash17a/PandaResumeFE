@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import html2pdf from "html2pdf.js";
+import { Download, Loader2, FlaskConical, AlertTriangle, X } from "lucide-react";
 import { useForm } from "../context/formHooks.js";
 import { populateDummyData } from "../utils/dummyData.js";
 
@@ -14,135 +15,201 @@ import AchievementsSection from "./FormSections/AchievementsSection.jsx";
 import LanguagesSection from "./FormSections/LanguagesSection.jsx";
 import InterestsSection from "./FormSections/InterestsSection.jsx";
 
+const SECTIONS = [
+  { key: "basic", label: "Basic info", Component: BasicInfoSection, needsTemplate: true },
+  { key: "experience", label: "Experience", Component: ExperienceSection },
+  { key: "education", label: "Education", Component: EducationSection },
+  { key: "skills", label: "Skills", Component: SkillsSection },
+  { key: "certifications", label: "Certifications", Component: CertificationsSection },
+  { key: "projects", label: "Projects", Component: ProjectsSection },
+  { key: "achievements", label: "Achievements", Component: AchievementsSection },
+  { key: "languages", label: "Languages", Component: LanguagesSection },
+  { key: "interests", label: "Interests", Component: InterestsSection },
+];
+
 export default function StructuredFormNew({ template }) {
   const { state, dispatch } = useForm();
+
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState(null);
 
   // Development dummy data handler
   const handlePopulateDummyData = () => {
     populateDummyData(dispatch);
   };
 
-  // Simple and reliable PDF download with color conversion
-  const downloadPDF = async (buttonElement) => {
+  const handleResetForm = () => {
+    dispatch({ type: 'RESET_FORM' });
+  };
+
+  // Temporarily swap any unsupported color formats (e.g. oklch) for values
+  // html2canvas can render, and hand back a function that restores them.
+  const withPrintableColors = (root) => {
+    const patched = [];
+
+    root.querySelectorAll("*").forEach((el) => {
+      const style = window.getComputedStyle(el);
+      const original = { color: el.style.color, backgroundColor: el.style.backgroundColor, borderColor: el.style.borderColor };
+      let touched = false;
+
+      if (style.color?.includes("oklch")) {
+        el.style.color = "#000000";
+        touched = true;
+      }
+      if (style.backgroundColor?.includes("oklch")) {
+        el.style.backgroundColor = "#ffffff";
+        touched = true;
+      }
+      if (style.borderColor?.includes("oklch")) {
+        el.style.borderColor = "#e5e7eb";
+        touched = true;
+      }
+
+      if (touched) patched.push({ el, original });
+    });
+
+    return () => {
+      patched.forEach(({ el, original }) => {
+        el.style.color = original.color;
+        el.style.backgroundColor = original.backgroundColor;
+        el.style.borderColor = original.borderColor;
+      });
+    };
+  };
+
+  const downloadPDF = async () => {
     const element = document.getElementById("resume-preview");
     if (!element) {
-      alert("Resume preview not found. Make sure it has id='resume-preview'.");
+      setError("Resume preview not found. Make sure it has id=\"resume-preview\".");
       return;
     }
 
-    let originalButtonText = '';
+    setError(null);
+    setIsGenerating(true);
+
+    const restoreColors = withPrintableColors(element);
+
     try {
-      // Show loading state
-      if (buttonElement) {
-        originalButtonText = buttonElement.textContent;
-        buttonElement.textContent = "Generating PDF...";
-        buttonElement.disabled = true;
-      }
-
-      // Convert unsupported color formats before PDF generation
-      const convertColors = (element) => {
-        const elementsWithColor = element.querySelectorAll('*');
-        elementsWithColor.forEach(el => {
-          const style = window.getComputedStyle(el);
-          const color = style.color;
-          const bgColor = style.backgroundColor;
-          const borderColor = style.borderColor;
-
-          // Convert oklch colors to fallback colors
-          if (color && color.includes('oklch')) {
-            el.style.color = '#000000'; // Fallback to black
-          }
-          if (bgColor && bgColor.includes('oklch')) {
-            el.style.backgroundColor = '#ffffff'; // Fallback to white
-          }
-          if (borderColor && borderColor.includes('oklch')) {
-            el.style.borderColor = '#e5e7eb'; // Fallback to gray
-          }
-        });
-      };
-
-      // Apply color conversion
-      convertColors(element);
-
-      // Simple configuration that should work
       const opt = {
-        margin: 10,
+        margin: 0,
         filename: `${(state.name || "resume").replace(/\s+/g, "_")}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
           scale: 2,
           useCORS: true,
           logging: false,
-          backgroundColor: '#ffffff',
+          backgroundColor: "#ffffff",
           letterRendering: true,
-          allowTaint: false
+          allowTaint: false,
+          scrollX: 0,
+          scrollY: 0,
         },
-        jsPDF: { 
-          unit: 'mm',
-          format: 'a4',
-          orientation: 'portrait'
+        jsPDF: {
+          unit: "mm",
+          format: "a4",
+          orientation: "portrait",
         },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
-      // Generate PDF
       await html2pdf().set(opt).from(element).save();
-
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      alert(`Failed to generate PDF: ${error.message || 'Unknown error'}. Please try again.`);
+    } catch (err) {
+      console.error("PDF generation error:", err);
+      setError(`Couldn't generate the PDF: ${err.message || "please try again."}`);
     } finally {
-      // Restore button state
-      if (buttonElement && originalButtonText) {
-        buttonElement.textContent = originalButtonText;
-        buttonElement.disabled = false;
-      }
+      restoreColors();
+      setIsGenerating(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-xl rounded-lg">
-      <h2 className="text-3xl font-bold text-center text-indigo-600 mb-8 pb-3 border-b-4 border-indigo-100">
-        Professional Resume Builder
-      </h2>
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-32">
+        {/* Header */}
+        <div className="mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
+            Build your resume
+          </h2>
+          <p className="mt-1.5 text-sm text-slate-500">
+            Fill in each section below — your preview updates as you type.
+          </p>
+        </div>
 
-      {/* Development-only dummy data button */}
-      {import.meta.env.DEV && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-sm font-semibold text-yellow-800">Development Mode</h4>
-              <p className="text-xs text-yellow-600">Populate form with dummy data for testing</p>
+        {/* Development-only dummy data banner */}
+        {import.meta.env.DEV && (
+          <div className="mb-6 flex items-center justify-between gap-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <div className="flex items-start gap-3">
+              <FlaskConical size={18} className="text-amber-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-amber-800">Development mode</p>
+                <p className="text-xs text-amber-600 mt-0.5">Populate the form with sample data for testing.</p>
+              </div>
             </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleResetForm}
+                className="flex-shrink-0 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 text-sm font-medium transition-colors"
+              >
+                Reset form
+              </button>
+              <button
+                onClick={handlePopulateDummyData}
+                className="flex-shrink-0 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm font-medium transition-colors"
+              >
+                Fill sample data
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Error banner */}
+        {error && (
+          <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+            <AlertTriangle size={18} className="text-red-500 mt-0.5 flex-shrink-0" />
+            <p className="flex-1 text-sm text-red-700">{error}</p>
             <button
-              onClick={handlePopulateDummyData}
-              className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 text-sm font-medium"
+              onClick={() => setError(null)}
+              className="flex-shrink-0 text-red-400 hover:text-red-600 transition-colors"
+              aria-label="Dismiss"
             >
-              Fill Dummy Data
+              <X size={16} />
             </button>
           </div>
+        )}
+
+        {/* Form sections */}
+        <div className="space-y-6">
+          {SECTIONS.map(({ key, Component, needsTemplate }) => (
+            <section
+              key={key}
+              className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm"
+            >
+              <Component {...(needsTemplate ? { template } : {})} />
+            </section>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* Render all form sections */}
-      <BasicInfoSection template={template} />
-      <ExperienceSection />
-      <EducationSection />
-      <SkillsSection />
-      <CertificationsSection />
-      <ProjectsSection />
-      <AchievementsSection />
-      <LanguagesSection />
-      <InterestsSection />
-
-      {/* Download Button */}
-      <div className="mt-6 flex justify-center">
-        <button
-          onClick={(e) => downloadPDF(e.currentTarget)}
-          className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-lg font-semibold"
-        >
-          Download PDF Resume
-        </button>
+      {/* Sticky download bar */}
+      <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur-md border-t border-slate-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex justify-center">
+          <button
+            onClick={downloadPDF}
+            disabled={isGenerating}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-base font-semibold transition-colors"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Generating PDF…
+              </>
+            ) : (
+              <>
+                <Download size={18} />
+                Download PDF resume
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

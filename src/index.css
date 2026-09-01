@@ -1,7 +1,28 @@
 @import "tailwindcss";
 
+@page {
+  size: A4;
+  margin: 0.25cm;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
 /* Print styles for PDF generation */
 @media print {
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   /* Prevent content from being cut off across page breaks */
   .break-inside-avoid-page {
     break-inside: avoid-page;
@@ -41,8 +62,12 @@
   
   /* Main resume container */
   #resume-preview {
+    margin: 0 !important;
+    padding: 0 !important;
     break-inside: avoid-page;
     page-break-inside: avoid;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
   
   /* Remove unnecessary elements from print */

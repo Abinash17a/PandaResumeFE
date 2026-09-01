@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "../../context/formHooks.js";
 import { actionTypes } from "../../constants/formConstants.js";
 import RichTextEditor from "../RichTextEditor.jsx";
+import { createId } from "../../utils/id.js";
 
 // Consistent Label Component
 const InputLabel = ({ children }) => (
@@ -27,7 +28,7 @@ export default function ProjectsSection() {
         type: actionTypes.ADD_PROJECT,
         payload: {
           ...currentProject,
-          id: Date.now()
+          id: createId()
         }
       });
       setCurrentProject({

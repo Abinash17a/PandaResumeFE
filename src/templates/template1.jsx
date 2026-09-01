@@ -110,20 +110,20 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
     width: "100%",
     maxWidth: "900px",
     margin: "0 auto",
-    padding: "16px 24px",
+    padding: "8px 18px 10px",
     backgroundColor: "#ffffff",
     fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    fontSize: "clamp(9px, 2.5vw, 11px)", // Responsive font size
-    lineHeight: 1.5,
+    fontSize: "clamp(9px, 2.5vw, 11px)",
+    lineHeight: 1.45,
     color: "#333",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-    borderRadius: "8px"
+    boxShadow: "none",
+    borderRadius: "0"
   }
 
   const headerStyle = {
     textAlign: "center",
-    paddingBottom: "clamp(12px, 3vw, 16px)",
-    marginBottom: "clamp(16px, 4vw, 20px)",
+    paddingBottom: "8px",
+    marginBottom: "10px",
   }
 
   const nameStyle = {
@@ -149,19 +149,19 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
   }
 
   const sectionHeaderStyle = {
-    fontSize: "clamp(9px, 3vw, 11pt)", // Responsive section headers
+    fontSize: "clamp(9px, 3vw, 11pt)",
     fontWeight: 700,
     textTransform: "uppercase",
     letterSpacing: "1px",
     color: "#1a1a1a",
-    marginTop: "clamp(8px, 2vw, 12px)",
-    marginBottom: "clamp(4px, 1vw, 6px)",
-    paddingBottom: "4px",
+    marginTop: "4px",
+    marginBottom: "4px",
+    paddingBottom: "2px",
     borderBottom: "1px solid #1a1a1a",
   }
 
   const subsectionStyle = {
-    marginBottom: "clamp(8px, 2vw, 12px)",
+    marginBottom: "6px",
   }
 
   const jobTitleStyle = {
@@ -172,22 +172,22 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
   }
 
   const bulletListStyle = {
-    margin: "4px 0 0 0",
+    margin: "2px 0 0 0",
     paddingLeft: "clamp(12px, 3vw, 16px)",
-    fontSize: "clamp(8px, 2.5vw, 10pt)", // Responsive bullet text
-    lineHeight: 1.5,
+    fontSize: "clamp(8px, 2.5vw, 10pt)",
+    lineHeight: 1.4,
   }
 
   const bulletItemStyle = {
-    marginBottom: "2px",
+    marginBottom: "1px",
   }
 
   const summaryStyle = {
-    fontSize: "clamp(8px, 2.5vw, 10pt)", // Responsive summary text
-    lineHeight: 1.5,
+    fontSize: "clamp(8px, 2.5vw, 10pt)",
+    lineHeight: 1.4,
     color: "#333",
     textAlign: "left",
-    marginBottom: "8px",
+    marginBottom: "6px",
     wordWrap: "break-word"
   }
 

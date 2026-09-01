@@ -1,9 +1,10 @@
 import { actionTypes } from "../constants/formConstants.js";
+import { createId } from "./id.js";
 
 // Comprehensive dummy data for resume testing
 export const dummyResumeData = {
   // Basic info
-  name: "John Doe",
+  name: "John Toe",
   email: "john.doe@example.com",
   phone: "(555) 123-4567",
   linkedin: "https://linkedin.com/in/johndoe",
@@ -14,7 +15,7 @@ export const dummyResumeData = {
   // Experiences
   experiences: [
     {
-      id: Date.now() + 1,
+      id: createId(),
       title: "Senior Software Engineer",
       company: "Tech Solutions Inc.",
       location: "San Francisco, CA",
@@ -24,7 +25,7 @@ export const dummyResumeData = {
       description: "Lead development of enterprise web applications using React and Node.js. Mentored junior developers and implemented CI/CD pipelines."
     },
     {
-      id: Date.now() + 2,
+      id: createId(),
       title: "Full Stack Developer",
       company: "Digital Innovations Ltd",
       location: "New York, NY",
@@ -38,7 +39,7 @@ export const dummyResumeData = {
   // Education
   educationItems: [
     {
-      id: Date.now() + 3,
+      id: createId(),
       degreeType: "B.Tech",
       degree: "B.Tech in Computer Science",
       specialization: "Computer Science",
@@ -65,14 +66,14 @@ export const dummyResumeData = {
   // Certifications
   certifications: [
     {
-      id: Date.now() + 4,
+      id: createId(),
       name: "AWS Certified Solutions Architect",
       issuer: "Amazon Web Services",
       date: "2023-03-15",
       expiryDate: "2026-03-15"
     },
     {
-      id: Date.now() + 5,
+      id: createId(),
       name: "React Developer Certification",
       issuer: "Meta",
       date: "2022-11-20",
@@ -83,7 +84,7 @@ export const dummyResumeData = {
   // Projects
   projects: [
     {
-      id: Date.now() + 6,
+      id: createId(),
       title: "E-Commerce Platform",
       description: "Built a full-stack e-commerce platform with React, Node.js, and MongoDB. Implemented user authentication, payment processing, and admin dashboard.",
       technologies: "React, Node.js, MongoDB, Stripe API, Redux",
@@ -92,7 +93,7 @@ export const dummyResumeData = {
       link: "https://github.com/johndoe/ecommerce-platform"
     },
     {
-      id: Date.now() + 7,
+      id: createId(),
       title: "Task Management App",
       description: "Developed a real-time task management application with drag-and-drop functionality, team collaboration features, and progress tracking.",
       technologies: "Vue.js, Express, Socket.io, PostgreSQL",
@@ -112,9 +113,9 @@ export const dummyResumeData = {
   
   // Languages
   languages: [
-    { id: Date.now() + 8, language: "English", proficiency: "Native" },
-    { id: Date.now() + 9, language: "Spanish", proficiency: "Intermediate" },
-    { id: Date.now() + 10, language: "French", proficiency: "Basic" }
+    { id: createId(), language: "English", proficiency: "Native" },
+    { id: createId(), language: "Spanish", proficiency: "Intermediate" },
+    { id: createId(), language: "French", proficiency: "Basic" }
   ],
   
   // Interests

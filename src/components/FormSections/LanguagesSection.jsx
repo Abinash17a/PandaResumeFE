@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "../../context/formHooks.js";
 import { actionTypes } from "../../constants/formConstants.js";
+import { createId } from "../../utils/id.js";
 
 // Consistent Label Component
 const InputLabel = ({ children }) => (
@@ -36,7 +37,7 @@ export default function LanguagesSection() {
         type: actionTypes.ADD_LANGUAGE,
         payload: {
           ...currentLanguage,
-          id: Date.now()
+          id: createId()
         }
       });
       setCurrentLanguage({

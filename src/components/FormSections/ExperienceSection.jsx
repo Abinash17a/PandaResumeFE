@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "../../context/formHooks.js";
 import { actionTypes } from "../../constants/formConstants.js";
 import RichTextEditor from "../RichTextEditor.jsx";
+import { createId } from "../../utils/id.js";
 
 // Consistent Label Component
 const InputLabel = ({ children }) => (
@@ -28,7 +29,7 @@ export default function ExperienceSection() {
         type: actionTypes.ADD_EXPERIENCE,
         payload: {
           ...currentExperience,
-          id: Date.now() // Unique ID for keying
+          id: createId()
         }
       });
       setCurrentExperience({

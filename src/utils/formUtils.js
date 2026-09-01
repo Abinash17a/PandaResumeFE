@@ -1,3 +1,5 @@
+import { createId } from "./id";
+
 // Form reducer function
 export const formReducer = (state, action) => {
   switch (action.type) {
@@ -18,7 +20,7 @@ export const formReducer = (state, action) => {
     case 'ADD_EXPERIENCE':
       return {
         ...state,
-        experiences: [...state.experiences, { ...action.payload, id: Date.now() }]
+        experiences: [...state.experiences, { ...action.payload, id: createId() }]
       };
 
     case 'REMOVE_EXPERIENCE':
@@ -39,7 +41,7 @@ export const formReducer = (state, action) => {
     case 'ADD_EDUCATION':
       return {
         ...state,
-        educationItems: [...state.educationItems, { ...action.payload, id: Date.now() }]
+        educationItems: [...state.educationItems, { ...action.payload, id: createId() }]
       };
 
     case 'REMOVE_EDUCATION':
@@ -85,7 +87,7 @@ export const formReducer = (state, action) => {
     case 'ADD_CERTIFICATION':
       return {
         ...state,
-        certifications: [...state.certifications, { ...action.payload, id: Date.now() }]
+        certifications: [...state.certifications, { ...action.payload, id: createId() }]
       };
     
     case 'REMOVE_CERTIFICATION':
@@ -106,7 +108,7 @@ export const formReducer = (state, action) => {
     case 'ADD_PROJECT':
       return {
         ...state,
-        projects: [...state.projects, { ...action.payload, id: Date.now() }]
+        projects: [...state.projects, { ...action.payload, id: createId() }]
       };
     
     case 'REMOVE_PROJECT':
@@ -140,7 +142,7 @@ export const formReducer = (state, action) => {
     case 'ADD_LANGUAGE':
       return {
         ...state,
-        languages: [...state.languages, { ...action.payload, id: Date.now() }]
+        languages: [...state.languages, { ...action.payload, id: createId() }]
       };
     
     case 'REMOVE_LANGUAGE':
@@ -177,6 +179,7 @@ export const formReducer = (state, action) => {
         email: "",
         phone: "",
         linkedin: "",
+        city: "",
         summary: "",
         profileImage: "",
         experiences: [],
