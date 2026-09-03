@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye } from "lucide-react";
 import StructuredFormNew from "../StructuredFormNew";
 import Preview from "../Preview";
 
@@ -23,15 +24,17 @@ function MobileLayout({
       <button
         onClick={() => setShowPreview(true)}
         className="
-          fixed bottom-6 right-6
+          fixed bottom-4 left-4
           bg-blue-600 hover:bg-blue-700
           text-white p-4
           rounded-full shadow-lg
           z-50
+          inline-flex items-center justify-center
         "
         aria-label="Preview Resume"
+        title="Preview Resume"
       >
-        {/* icon */}
+        <Eye size={22} />
       </button>
 
       {/* Preview Modal */}

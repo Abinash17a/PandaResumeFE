@@ -14,7 +14,8 @@ export default function Preview({
   template,
   fontSize,
   setFontSize,
-  fontSizeConfig
+  fontSizeConfig,
+  previewId = "resume-preview"
 }) {
 
   const [showATSModal, setShowATSModal] = useState(false);
@@ -181,6 +182,7 @@ export default function Preview({
       template1: (
         <Template1
           data={formattedData}
+          previewId={previewId}
           fontSizeConfig={compactTemplateConfig}
           spacingConfig={compactMode ? {
             lineHeight: "leading-tight",
@@ -195,6 +197,7 @@ export default function Preview({
       template2: (
         <Template2
           data={formattedData}
+          previewId={previewId}
           fontSizeConfig={compactTemplateConfig}
           spacingConfig={compactMode ? {
             lineHeight: "leading-tight",
@@ -271,20 +274,21 @@ export default function Preview({
               {compactMode ? "Compact on" : "A4 fit"}
             </button>
 
-            {/* ATS Checker Button */}
+            {/* ATS Checker Button - disabled for now */}
             <button
-              onClick={() => setShowATSModal(true)}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+              disabled
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed opacity-60"
+              aria-label="ATS Checker disabled"
             >
               <Target size={16} />
               ATS Checker
             </button>
 
-            {/* Mobile: Icon-only button */}
+            {/* Mobile: Icon-only button - disabled for now */}
             <button
-              onClick={() => setShowATSModal(true)}
-              className="sm:hidden flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-              aria-label="ATS Checker"
+              disabled
+              className="sm:hidden flex items-center justify-center w-10 h-10 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed opacity-60"
+              aria-label="ATS Checker disabled"
             >
               <Target size={16} />
             </button>
@@ -339,16 +343,22 @@ export default function Preview({
 
         {/* Main Preview Area */}
         <main
-          className="flex-1 overflow-auto p-4 md:p-8 lg:p-12 pb-28 custom-scrollbar"
+          className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 lg:p-12 pb-28 custom-scrollbar"
           onWheel={handleWheel}
         >
           <div
-            className="mx-auto max-w-200 transition-transform duration-150 ease-out"
-            style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top center" }}
+            className="mx-auto w-full transition-transform duration-150 ease-out"
+            style={{
+              width: "100%",
+              maxWidth: "min(794px, calc(100vw - 2rem))",
+              transform: `scale(${zoom / 100})`,
+              transformOrigin: "top center",
+            }}
           >
             {/* Shadow & Paper Effect */}
             <div className="
               relative
+              w-full
               bg-white
               shadow-[0_20px_50px_rgba(0,0,0,0.1)]
               transition-transform

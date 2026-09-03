@@ -1,4 +1,4 @@
-export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfig = {} }) {
+export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfig = {}, previewId = "resume-preview" }) {
   console.log("sizing-----------",fontSizeConfig,"----------------------",spacingConfig)
   // Destructure with defaults - responsive sizing
   const {
@@ -223,9 +223,27 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
   const skillsValueStyle = {
     display: "inline",
   }
+
+  const mobileClampStyle = {
+    display: "-webkit-box",
+    WebkitLineClamp: 4,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  }
+
+  const mobileProjectTitleStyle = {
+    ...jobTitleStyle,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  }
+
   return (
     <div
-      id="resume-preview"
+      id={previewId}
       role="document"
       style={containerStyle}
       className={`w-full max-w-4xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-3 sm:py-4 md:py-5 lg:py-6 ${lineHeight} ${letterSpacing} text-gray-800 print:px-6 print:py-4 print:max-w-none print:shadow-none print:rounded-none`}
@@ -330,7 +348,11 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
       {data.summary && (
         <section aria-label="Professional Summary" className={`${sectionMargin} ${sectionPadding} ${borderRadius} bg-white`}>
           <h2 className={`${subheading} text-gray-800 border-b border-gray-200 pb-1 mb-3`}>Professional Summary</h2>
-          <div className={`${body} text-gray-700`} style={summaryStyle} dangerouslySetInnerHTML={{ __html: data.summary }} />
+          <div
+            className={`${body} text-gray-700`}
+            style={summaryStyle}
+            dangerouslySetInnerHTML={{ __html: data.summary }}
+          />
         </section>
       )}
 
@@ -365,7 +387,11 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
               {exp.bullets && exp.bullets.length > 0 && (
                 <ul style={bulletListStyle}>
                   {exp.bullets.map((bullet, j) => (
-                    <li key={`exp-${i}-${j}`} style={bulletItemStyle} dangerouslySetInnerHTML={{ __html: bullet }}>
+                    <li
+                      key={`exp-${i}-${j}`}
+                      style={bulletItemStyle}
+                      dangerouslySetInnerHTML={{ __html: bullet }}
+                    >
                     </li>
                   ))}
                 </ul>
@@ -385,7 +411,11 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
               {project.bullets.length > 0 && (
                 <ul style={bulletListStyle}>
                   {project.bullets.map((bullet, j) => (
-                    <li key={`project-${i}-${j}`} style={bulletItemStyle} dangerouslySetInnerHTML={{ __html: bullet }}>
+                    <li
+                      key={`project-${i}-${j}`}
+                      style={bulletItemStyle}
+                      dangerouslySetInnerHTML={{ __html: bullet }}
+                    >
                     </li>
                   ))}
                 </ul>

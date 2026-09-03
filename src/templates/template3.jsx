@@ -1,4 +1,4 @@
-export default function Template2({ data = {}, fontSizeConfig = {}, spacingConfig = {} }) {
+export default function Template2({ data = {}, fontSizeConfig = {}, spacingConfig = {}, previewId = "resume-preview" }) {
   const {
     heading = 'text-[18px] sm:text-[20px] lg:text-[22px] leading-tight font-bold',
     subheading = 'text-[13px] sm:text-[14px] lg:text-[15px] font-semibold',
@@ -125,11 +125,28 @@ export default function Template2({ data = {}, fontSizeConfig = {}, spacingConfi
 
   const bulletItemStyle = { marginBottom: '2px' };
 
+  const mobileClampStyle = {
+    display: '-webkit-box',
+    WebkitLineClamp: 4,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  };
+
+  const mobileProjectTitleStyle = {
+    ...jobTitleStyle,
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  };
+
   const subsectionStyle = { marginBottom: 'clamp(8px, 2vw, 12px)' };
 
   return (
     <div
-      id="resume-preview"
+      id={previewId}
       role="document"
       style={containerStyle}
       className={`w-full max-w-4xl mx-auto ${lineHeight} ${letterSpacing} text-gray-800 print:shadow-none print:rounded-none print:max-w-none`}

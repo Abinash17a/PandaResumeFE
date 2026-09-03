@@ -26,12 +26,7 @@ function ResumeEditorPage() {
     fontSizeConfig[fontSize] || fontSizeConfig.medium;
 
   return (
-    <div className="min-h-screen">
-
-      <header className="p-4 bg-white border-b">
-        {/* Editor controls */}
-      </header>
-
+    <div className="min-h-screen bg-slate-50">
       <main>
 
         <DesktopLayout

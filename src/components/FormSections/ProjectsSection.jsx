@@ -129,46 +129,208 @@ export default function ProjectsSection() {
         </button>
       </div>
       
-      <div className="space-y-4">
-        {state.projects?.map((proj) => (
-          <div key={proj.id} className="group p-5 border border-gray-100 rounded-2xl bg-white hover:border-purple-100 hover:shadow-md transition-all">
-            <div className="flex justify-between items-start">
-              <div className="flex gap-4">
-                <div className="h-12 w-12 bg-gray-50 rounded-xl flex items-center justify-center text-xl group-hover:bg-purple-50 transition-colors">
-                  🚀
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 text-lg">{proj.title}</h4>
-                  <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-tight">
-                    {proj.startDate} — {proj.endDate}
-                  </p>
-                  {proj.description && (
-                    <div className="text-sm text-gray-600 mt-3 leading-relaxed" dangerouslySetInnerHTML={{ __html: proj.description }} />
-                  )}
-                  {proj.technologies && (
-                    <p className="text-sm font-semibold text-purple-600 mt-2">
-                      <strong>Technologies:</strong> {proj.technologies}
-                    </p>
-                  )}
-                  {proj.link && (
-                    <p className="text-sm text-blue-600 mt-2">
-                      <strong>Link:</strong> <a href={proj.link} target="_blank" rel="noopener noreferrer" className="hover:underline">{proj.link}</a>
-                    </p>
-                  )}
-                </div>
-              </div>
-              <button
-                onClick={() => removeProject(proj.id)}
-                className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
+<div className="space-y-4 w-full max-w-full min-w-0">
+  {state.projects?.map((proj) => (
+    <div
+      key={proj.id}
+      className="
+        group
+        relative
+        w-full
+        max-w-full
+        min-w-0
+        box-border
+        p-4
+        sm:p-5
+        border
+        border-gray-100
+        rounded-2xl
+        bg-white
+        hover:border-purple-100
+        hover:shadow-md
+        transition-all
+        overflow-hidden
+      "
+    >
+      {/* Delete Button */}
+<button
+  type="button"
+  onClick={() => removeProject(proj.id)}
+  className="
+    absolute
+    top-3
+    right-3
+    z-10
+    w-7
+    h-7
+    flex
+    items-center
+    justify-center
+    rounded-lg
+    text-gray-300
+    bg-transparent
+    hover:bg-red-50
+    hover:text-red-500
+    transition-all
+    duration-200
+  "
+  aria-label={`Remove ${proj.title}`}
+>
+  <svg
+    className="w-4 h-4"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+    />
+  </svg>
+</button>
+
+      {/* Project Content */}
+      <div className="flex items-start gap-3 sm:gap-4 w-full min-w-0">
+
+        {/* Rocket Icon */}
+        <div
+          className="
+            h-10
+            w-10
+            sm:h-12
+            sm:w-12
+            shrink-0
+            bg-gray-50
+            rounded-xl
+            flex
+            items-center
+            justify-center
+            text-lg
+            sm:text-xl
+            group-hover:bg-purple-50
+            transition-colors
+          "
+        >
+          🚀
+        </div>
+
+        {/* Text Content */}
+        <div className="flex-1 min-w-0 w-0 pr-8 sm:pr-10">
+
+          {/* Title */}
+          <h4
+            className="
+              font-bold
+              text-gray-900
+              text-base
+              sm:text-lg
+              leading-snug
+              break-words
+              whitespace-normal
+            "
+          >
+            {proj.title}
+          </h4>
+
+          {/* Date */}
+          <p
+            className="
+              text-[10px]
+              sm:text-xs
+              font-bold
+              text-gray-400
+              mt-1
+              uppercase
+              tracking-tight
+              break-words
+            "
+          >
+            {proj.startDate} — {proj.endDate}
+          </p>
+
+          {/* Description */}
+          {proj.description && (
+            <div
+              className="
+                w-full
+                max-w-full
+                min-w-0
+                text-sm
+                text-gray-600
+                mt-3
+                leading-relaxed
+                break-words
+              "
+              style={{
+                overflowWrap: "anywhere",
+                wordBreak: "break-word",
+              }}
+              dangerouslySetInnerHTML={{
+                __html: proj.description,
+              }}
+            />
+          )}
+
+          {/* Technologies */}
+          {proj.technologies && (
+            <div
+              className="
+                w-full
+                max-w-full
+                min-w-0
+                text-sm
+                font-semibold
+                text-purple-600
+                mt-2
+                break-words
+              "
+              style={{
+                overflowWrap: "anywhere",
+                wordBreak: "break-word",
+              }}
+            >
+              <strong>Technologies:</strong>{" "}
+              <span className="font-medium">
+                {proj.technologies}
+              </span>
             </div>
-          </div>
-        ))}
+          )}
+
+          {/* Link */}
+          {proj.link && (
+            <div
+              className="
+                w-full
+                max-w-full
+                min-w-0
+                text-sm
+                text-blue-600
+                mt-2
+              "
+            >
+              <strong>Link:</strong>{" "}
+              <a
+                href={proj.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+                style={{
+                  overflowWrap: "anywhere",
+                  wordBreak: "break-word",
+                }}
+              >
+                {proj.link}
+              </a>
+            </div>
+          )}
+
+        </div>
       </div>
+    </div>
+  ))}
+</div>
     </div>
   );
 }

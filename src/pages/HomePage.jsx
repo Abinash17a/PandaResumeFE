@@ -147,7 +147,7 @@ function HomePage() {
               >
                 <div className="flex items-center gap-4">
                   <div
-                    className="h-14 w-14 rounded-full flex-shrink-0"
+                    className="h-14 w-14 rounded-full shrink-0"
                     style={{ backgroundColor: "#EFE7D6" }}
                   />
                   <div className="flex-1 space-y-2">
