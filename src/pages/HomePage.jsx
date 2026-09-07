@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Eye, ShieldCheck, LayoutTemplate, Type, Download, Lock } from "lucide-react";
+import { Eye, ShieldCheck, LayoutTemplate, Type, Download, Lock, Bug } from "lucide-react";
 
 const INK = "#16233F";
 const PAPER = "#FDFCF9";
@@ -7,6 +7,7 @@ const ACCENT = "#B8862E";
 const MUTED = "#5B6472";
 const LINE = "#E3DFD5";
 const NAVY = "#101A30";
+const BUG_REPORT_EMAIL = "abinashchhetri.44@gmail.com";
 
 const FEATURES = [
   {
@@ -345,11 +346,23 @@ function HomePage() {
 
       {/* Footer */}
       <footer style={{ backgroundColor: NAVY }}>
-        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-5">
           <span className="font-serif text-white text-lg">ResumeBuilder</span>
-          <p className="text-sm" style={{ color: "#8A93AC" }}>
-            &copy; {new Date().getFullYear()} ResumeBuilder. All rights reserved.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <a
+              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${BUG_REPORT_EMAIL}&su=ResumeBuilder%20bug%20report&body=What%20happened%3F%0A%0AWhat%20device%20and%20browser%20were%20you%20using%3F%0A%0AHow%20can%20we%20reproduce%20it%3F`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 text-sm transition-colors hover:text-white"
+              style={{ color: "#C8D0E2" }}
+            >
+              <Bug size={16} />
+              Report a bug
+            </a>
+            <p className="text-sm" style={{ color: "#8A93AC" }}>
+              &copy; {new Date().getFullYear()} ResumeBuilder. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

@@ -50,7 +50,7 @@ export default function InterestsSection() {
       </div>
       
       <div className="mb-6">
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <input
             placeholder="e.g. Photography, Hiking, Chess, Reading"
             value={currentInterest}
@@ -60,7 +60,7 @@ export default function InterestsSection() {
           />
           <button
             onClick={addInterest}
-            className="px-6 py-2.5 bg-pink-600 text-white rounded-xl hover:bg-pink-700 font-bold text-sm shadow-md shadow-pink-100 transition-all active:scale-95"
+            className="w-full px-6 py-2.5 bg-pink-600 text-white rounded-xl hover:bg-pink-700 font-bold text-sm shadow-md shadow-pink-100 transition-all active:scale-95 sm:w-auto"
           >
             Add
           </button>

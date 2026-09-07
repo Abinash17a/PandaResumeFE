@@ -1,8 +1,3 @@
-import Template1 from "../templates/template1";
-import Template2 from "../templates/template2";
-import Template3 from "../templates/template3";
-import Template4 from "../templates/template4";
-
 // Declared at module scope (not inside Template4) so React doesn't treat it
 // as a new component type on every render — that was the "Cannot create
 // components during render" error. Bar color passed in via props since it
@@ -31,7 +26,7 @@ function SectionHeader({ children, barColor, textColor }) {
   );
 }
 
-function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, previewId = "resume-preview" }) {
+export default function Template4({ data = {}, fontSizeConfig = {}, spacingConfig = {}, previewId = "resume-preview" }) {
   // Destructure with defaults - responsive sizing (same contract as Template1)
   const {
     heading = 'text-[19px] sm:text-[21px] lg:text-[23px] leading-tight font-bold',
@@ -50,13 +45,20 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
   // --- helpers (identical contract to Template1) ---
   const parseList = (text) => {
     if (!text) return [];
-    const values = Array.isArray(text) ? text : String(text).split(/[,;\n]/);
-    return values
-      .map((value) => {
-        if (typeof value === 'string') return value.trim();
-        if (!value) return '';
-        return String(value.name || value.language || value.label || value.title || '').trim();
-      })
+    if (Array.isArray(text)) {
+      return text
+        .map((value) => {
+          if (typeof value === 'string') return value.trim();
+          if (!value) return '';
+          const label = value.name || value.language || value.label || value.title;
+          const proficiency = value.proficiency ? ` (${value.proficiency})` : '';
+          return label ? `${label}${proficiency}`.trim() : '';
+        })
+        .filter(Boolean);
+    }
+    return String(text)
+      .split(/[,;\n]/)
+      .map((s) => s.trim())
       .filter(Boolean);
   };
 
@@ -85,18 +87,16 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
   };
 
   const formatAchievements = (text) => {
-    if (!text) return [];
     if (Array.isArray(text)) {
       return text
         .map((achievement) => {
           if (typeof achievement === 'string') return achievement.trim();
           if (!achievement) return '';
-          return String(
-            achievement.text || achievement.description || achievement.title || ''
-          ).trim();
+          return String(achievement.text || achievement.description || achievement.title || '').trim();
         })
         .filter(Boolean);
     }
+    if (!text) return [];
     return String(text).split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
   };
 
@@ -145,30 +145,21 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
       .filter(Boolean);
   };
 
-  const languagesList = Array.isArray(data.languages)
-    ? data.languages
-      .map((language) => {
-        if (typeof language === 'string') return language.trim();
-        if (!language) return '';
-        const name = language.language || language.name || language.label || '';
-        const proficiency = language.proficiency || language.level || '';
-        return [name, proficiency ? `(${proficiency})` : ''].filter(Boolean).join(' ').trim();
-      })
-      .filter(Boolean)
-    : parseList(data.languages);
+  const languagesList = parseList(data.languages);
   const interestsList = parseList(data.interests);
   const experienceList = parseExperience(data.experiences);
   const educationList = parseEducation(data.educationItems);
   const certificationsList = parseCertifications(data.certifications);
   const achievementsList = formatAchievements(data.achievements);
   const projectsList = formatProjects(data.projects);
-  const technicalSkillsList = parseList([
-    ...(Array.isArray(data.technicalSkills) ? data.technicalSkills : []),
-    ...(Array.isArray(data.nonTechnicalSkills) ? data.nonTechnicalSkills : []),
-    ...(data.skills || []),
-  ]);
+  const technicalSkillsList = [
+    ...parseList(data.technicalSkills),
+    ...parseList(data.nonTechnicalSkills),
+    ...parseList(data.skills),
+  ];
   const email = String(data.email || '').replace(/\s+/g, '');
   const linkedin = String(data.linkedin || '').replace(/\s+/g, '');
+  const linkedinHref = linkedin && (/^https?:\/\//i.test(linkedin) ? linkedin : `https://${linkedin}`);
 
   const BAND = '#2F5D62';
   const BAND_MUTED = '#BFDAD9';
@@ -193,9 +184,7 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
 
   const bandStyle = {
     backgroundColor: BAND,
-    boxSizing: 'border-box',
-    minHeight: '80px',
-    padding: '14px 24px 12px',
+    padding: '18px 24px 16px',
   };
 
   const nameStyle = {
@@ -339,14 +328,14 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
           {data.phone && <span>•</span>}
           {data.phone && <span>{data.phone}</span>}
           {linkedin && <span>•</span>}
-          {linkedin && <span>{linkedin}</span>}
+          {linkedin && <a href={linkedinHref} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>{linkedin}</a>}
         </div>
       </header>
 
       <div style={bodyPadStyle}>
         {/* Summary */}
         {data.summary && (
-          <section aria-label="Professional Summary" className={`${section} break-inside-avoid-page`}>
+          <section aria-label="Professional Summary" className={`${section} break-inside-avoid-page`} style={{ pageBreakInside: 'avoid' }}>
             <SectionHeader barColor={BAND} textColor={BAND}>Summary</SectionHeader>
             <div className={`${body}`} style={summaryStyle} dangerouslySetInnerHTML={{ __html: data.summary }} />
           </section>
@@ -354,10 +343,10 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
 
         {/* Experience */}
         {experienceList.length > 0 && (
-          <section aria-label="Work Experience" className={`${section} break-inside-avoid-page`}>
+          <section aria-label="Work Experience" className={`${section} break-inside-avoid-page`} style={{ pageBreakInside: 'avoid' }}>
             <SectionHeader barColor={BAND} textColor={BAND}>Experience</SectionHeader>
             {experienceList.map((exp, i) => (
-              <div key={`exp-${i}`} className={`${item} break-inside-avoid-page`}>
+              <div key={`exp-${i}`} className={`${item} break-inside-avoid-page`} style={{ pageBreakInside: 'avoid' }}>
                 <div className={subheading} style={jobTitleStyle}>{exp.title}</div>
                 <div style={metaStyle}>
                   {exp.company}
@@ -383,10 +372,10 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
 
         {/* Projects */}
         {projectsList.length > 0 && (
-          <section aria-label="projects" className={`${section} break-inside-avoid-page`}>
+          <section aria-label="projects" className={`${section} break-inside-avoid-page`} style={{ pageBreakInside: 'avoid' }}>
             <SectionHeader barColor={BAND} textColor={BAND}>Projects</SectionHeader>
             {projectsList.map((project, i) => (
-              <div key={`project-${i}`} className={`${item} break-inside-avoid-page`}>
+              <div key={`project-${i}`} className={`${item} break-inside-avoid-page`} style={{ pageBreakInside: 'avoid' }}>
                 <div className={subheading} style={jobTitleStyle}>{project.title}</div>
                 {project.bullets.length > 0 && (
                   <ul style={bulletListStyle}>
@@ -404,10 +393,10 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
 
         {/* Education */}
         {educationList.length > 0 && (
-          <section aria-label="Education" className={`${section} break-inside-avoid-page`}>
+          <section aria-label="Education" className={`${section} break-inside-avoid-page`} style={{ pageBreakInside: 'avoid' }}>
             <SectionHeader barColor={BAND} textColor={BAND}>Education</SectionHeader>
             {educationList.map((edu, idx) => (
-              <div key={`edu-${idx}`} className={`${item} break-inside-avoid-page`}>
+              <div key={`edu-${idx}`} className={`${item} break-inside-avoid-page`} style={{ pageBreakInside: 'avoid' }}>
                 <div className={subheading} style={jobTitleStyle}>{edu.degree}</div>
                 <div style={metaStyle}>
                   {edu.school}
@@ -433,7 +422,7 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
 
         {/* Certifications */}
         {certificationsList.length > 0 && (
-          <section aria-label="certifications" className={`${section} break-inside-avoid-page`}>
+          <section aria-label="certifications" className={`${section} break-inside-avoid-page`} style={{ pageBreakInside: 'avoid' }}>
             <SectionHeader barColor={BAND} textColor={BAND}>Certifications</SectionHeader>
             <ul style={bulletListStyle}>
               {certificationsList.map((cert, i) => (
@@ -445,7 +434,7 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
 
         {/* Achievements */}
         {achievementsList.length > 0 && (
-          <section aria-label="achievements" className={`${section} break-inside-avoid-page`}>
+          <section aria-label="achievements" className={`${section} break-inside-avoid-page`} style={{ pageBreakInside: 'avoid' }}>
             <SectionHeader barColor={BAND} textColor={BAND}>Notable Achievements</SectionHeader>
             <ul style={bulletListStyle}>
               {achievementsList.map((achievement, i) => (
@@ -457,78 +446,29 @@ function Template4Preview({ data = {}, fontSizeConfig = {}, spacingConfig = {}, 
 
         {/* Skills — pill tags. Body content is flush left, same as every
             other section above — no extra indent beyond the header. */}
-        <section aria-label="Skills" className="break-inside-avoid-page">
+        <section aria-label="Skills" className="break-inside-avoid-page" style={{ pageBreakInside: 'avoid' }}>
           <SectionHeader barColor={BAND} textColor={BAND}>Skills</SectionHeader>
-          <div style={{ paddingLeft: '13px' }}>
-            {technicalSkillsList.length > 0 && (
-              <div style={{ marginBottom: '8px' }}>
-                {technicalSkillsList.map((skill, i) => (
-                  <span key={`skill-${i}`} style={pillStyle}>{skill}</span>
-                ))}
-              </div>
-            )}
-            {languagesList.length > 0 && (
-              <div style={{ fontSize: '9pt', marginBottom: '4px' }}>
-                <span style={{ fontWeight: 700, marginRight: '6px' }}>Languages:</span>
-                {languagesList.join(', ')}
-              </div>
-            )}
-            {interestsList.length > 0 && (
-              <div style={{ fontSize: '9pt' }}>
-                <span style={{ fontWeight: 700, marginRight: '6px' }}>Interests:</span>
-                {interestsList.join(', ')}
-              </div>
-            )}
-          </div>
+          {technicalSkillsList.length > 0 && (
+            <div style={{ marginBottom: '8px' }}>
+              {technicalSkillsList.map((skill, i) => (
+                <span key={`skill-${i}`} style={pillStyle}>{skill}</span>
+              ))}
+            </div>
+          )}
+          {languagesList.length > 0 && (
+            <div style={{ fontSize: '9pt', marginBottom: '4px' }}>
+              <span style={{ fontWeight: 700, marginRight: '6px' }}>Languages:</span>
+              {languagesList.join(', ')}
+            </div>
+          )}
+          {interestsList.length > 0 && (
+            <div style={{ fontSize: '9pt' }}>
+              <span style={{ fontWeight: 700, marginRight: '6px' }}>Interests:</span>
+              {interestsList.join(', ')}
+            </div>
+          )}
         </section>
       </div>
-    </div>
-  );
-}
-
-export default function Preview({ template = "template1", fontSize = "medium", setFontSize, ...props }) {
-  const Template = {
-    template1: Template1,
-    template2: Template2,
-    template3: Template3,
-    template4: Template4,
-  }[template] || Template4Preview;
-
-  return (
-    <div className="relative">
-      {setFontSize && (
-        <div className="mb-3 flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm print:hidden">
-          <div className="flex min-w-0 items-center gap-2">
-            <label htmlFor="preview-font-size" className="flex items-center gap-2 text-xs font-semibold text-slate-600">
-              <span aria-hidden="true" className="text-sm font-bold text-slate-400">Aa</span>
-              Text size
-            </label>
-            <select
-              id="preview-font-size"
-              value={fontSize}
-              onChange={(event) => setFontSize(event.target.value)}
-              aria-label="Preview text size"
-              className="min-w-[104px] rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 outline-none transition-colors hover:border-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-            >
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-            </select>
-          </div>
-          <button
-            type="button"
-            disabled
-            title="ATS checker coming soon"
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-slate-200 bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-400 opacity-80"
-          >
-            ATS checker
-            <span className="rounded bg-slate-200 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-slate-500">
-              Coming soon
-            </span>
-          </button>
-        </div>
-      )}
-      <Template {...props} fontSizeConfig={props.fontSizeConfig} />
     </div>
   );
 }

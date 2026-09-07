@@ -146,8 +146,8 @@ export default function ExperienceSection() {
 
       {/* Experience List - Saved Items */}
       <div className="space-y-4">
-        {state.experiences?.map((exp) => (
-          <div key={exp.id} className="group p-6 border border-gray-100 rounded-2xl bg-white hover:border-indigo-100 hover:shadow-md transition-all">
+        {state.experiences?.map((exp, index) => (
+          <div key={`${exp.id || 'experience'}-${index}`} className="group p-6 border border-gray-100 rounded-2xl bg-white hover:border-indigo-100 hover:shadow-md transition-all">
             <div className="flex justify-between items-start">
               <div className="flex gap-4">
                 <div className="h-12 w-12 bg-gray-50 rounded-xl flex items-center justify-center text-xl group-hover:bg-indigo-50 transition-colors">

@@ -44,7 +44,8 @@ export const actionTypes = {
   REMOVE_INTEREST: 'REMOVE_INTEREST',
 
   // Reset
-  RESET_FORM: 'RESET_FORM'
+  RESET_FORM: 'RESET_FORM',
+  SET_FORM_DATA: 'SET_FORM_DATA'
 };
 
 // Initial state for form

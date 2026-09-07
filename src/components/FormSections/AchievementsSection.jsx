@@ -50,7 +50,7 @@ export default function AchievementsSection() {
       </div>
       
       <div className="mb-6">
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <input
             placeholder="e.g. Employee of the Year, Best Paper Award"
             value={currentAchievement}
@@ -60,7 +60,7 @@ export default function AchievementsSection() {
           />
           <button
             onClick={addAchievement}
-            className="px-6 py-2.5 bg-yellow-600 text-white rounded-xl hover:bg-yellow-700 font-bold text-sm shadow-md shadow-yellow-100 transition-all active:scale-95"
+            className="w-full px-6 py-2.5 bg-yellow-600 text-white rounded-xl hover:bg-yellow-700 font-bold text-sm shadow-md shadow-yellow-100 transition-all active:scale-95 sm:w-auto"
           >
             Add
           </button>

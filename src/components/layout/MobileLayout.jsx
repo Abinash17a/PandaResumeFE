@@ -13,71 +13,51 @@ function MobileLayout({
   const [showPreview, setShowPreview] = useState(false);
 
   return (
-    <div className="lg:hidden">
+    <div className="xl:hidden">
 
       {/* Form */}
-      <div className="p-4">
-        <StructuredFormNew template={template} />
+      <div className="p-4 print:hidden">
+        <StructuredFormNew
+          template={template}
+          onBeforePrint={() => setShowPreview(true)}
+          onBeforeDownload={() => setShowPreview(true)}
+        />
       </div>
 
-      {/* Preview Button */}
       <button
+        type="button"
         onClick={() => setShowPreview(true)}
-        className="
-          fixed bottom-4 left-4
-          bg-blue-600 hover:bg-blue-700
-          text-white p-4
-          rounded-full shadow-lg
-          z-50
-          inline-flex items-center justify-center
-        "
-        aria-label="Preview Resume"
-        title="Preview Resume"
+        className="fixed bottom-4 left-4 z-50 inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-blue-700 sm:bottom-20 print:hidden"
+        aria-label="View resume preview"
       >
-        <Eye size={22} />
+        <Eye size={20} />
+        Preview
       </button>
 
       {/* Preview Modal */}
       {showPreview && (
         <div
-          className="
-            fixed inset-0
-            bg-gray-900/50
-            flex items-start justify-center
-            z-50 p-4 overflow-y-auto
-          "
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/50 p-4 print:static print:block print:bg-white print:p-0"
           onClick={() => setShowPreview(false)}
         >
           <div
-            className="
-              bg-white rounded-lg
-              w-full max-w-2xl
-              my-8 relative
-            "
-            onClick={(e) => e.stopPropagation()}
+            className="my-8 w-full max-w-2xl rounded-lg bg-white print:my-0 print:max-w-none print:rounded-none"
+            onClick={(event) => event.stopPropagation()}
           >
-
-            <div className="
-              sticky top-0
-              bg-white p-4
-              border-b
-              flex justify-between items-center
-              z-10
-            ">
-              <h3 className="text-lg font-semibold">
-                Resume Preview
-              </h3>
-
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white p-4 print:hidden">
+              <h3 className="text-lg font-semibold">Resume Preview</h3>
               <button
+                type="button"
                 onClick={() => setShowPreview(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-2xl leading-none text-gray-500 hover:text-gray-700"
+                aria-label="Close resume preview"
               >
-                ✕
+                ×
               </button>
             </div>
 
-            <div className="max-h-[calc(100vh-10rem)] overflow-y-auto">
-              <div className="p-4">
+            <div className="max-h-[calc(100vh-10rem)] overflow-y-auto print:max-h-none print:overflow-visible">
+              <div className="p-4 print:p-0">
                 <Preview
                   data={resumeData}
                   template={template}
@@ -87,7 +67,6 @@ function MobileLayout({
                 />
               </div>
             </div>
-
           </div>
         </div>
       )}

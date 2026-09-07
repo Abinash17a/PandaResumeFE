@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useReducer } from 'react';
 import { initialState } from '../constants/formConstants.js';
-import { formReducer } from '../utils/formUtils.js';
+import { formReducer, normalizeImportedData } from '../utils/formUtils.js';
 
 const STORAGE_KEY = 'resumeBuilder.formData';
 
@@ -15,7 +15,7 @@ const loadInitialState = () => {
       return initialState;
     }
 
-    return { ...initialState, ...JSON.parse(savedState) };
+    return normalizeImportedData(JSON.parse(savedState));
   } catch (error) {
     console.error('Failed to load saved form data:', error);
     return initialState;

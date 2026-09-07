@@ -9,18 +9,18 @@ function DesktopLayout({
   fontSizeConfig
 }) {
   return (
-    <div className="hidden lg:flex h-[calc(100vh-80px)]">
+    <div className="hidden xl:flex h-[calc(100vh-80px)] print:block print:h-auto">
 
       {/* Form */}
-      <div className="w-1/2 overflow-y-auto">
+      <div className="w-1/2 overflow-y-auto print:hidden">
         <div className="p-4">
           <StructuredFormNew template={template} />
         </div>
       </div>
 
       {/* Preview */}
-      <div className="w-1/2 overflow-y-auto bg-gray-50">
-        <div className="p-4">
+      <div className="w-1/2 overflow-y-auto bg-gray-50 print:block print:w-full print:overflow-visible print:bg-white">
+        <div className="p-4 print:p-0">
           <Preview
             data={resumeData}
             template={template}

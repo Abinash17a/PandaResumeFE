@@ -1,8 +1,59 @@
 import { createId } from "./id";
 
+const FORM_ARRAY_KEYS = [
+  "experiences",
+  "educationItems",
+  "certifications",
+  "projects",
+  "languages",
+];
+
+const spacedEmailPattern = /[A-Z0-9_%+-]+(?:\s*\.\s*[A-Z0-9_%+-]+)*\s*@\s*[A-Z0-9-]+(?:\s*\.\s*[A-Z]{2,})/gi;
+const phonePattern = /\+?\d[\d\s().-]{7,}\d/g;
+const linkedinPattern = /(?:https?:\/\/\s*)?linkedin\s*\.\s*com\s*\/\s*[A-Z0-9._/-]+/gi;
+
+const sanitizeName = (value) => String(value || "")
+  .replace(spacedEmailPattern, " ")
+  .replace(linkedinPattern, " ")
+  .replace(phonePattern, " ")
+  .replace(/(?:^|\s)[+()\[\]{}|,:;]+(?=\s|$)/g, " ")
+  .replace(/\s+[+()-]+\s*$/g, "")
+  .replace(/[|•·]+/g, " ")
+  .replace(/\s+/g, " ")
+  .trim();
+
+export const normalizeImportedData = (payload) => {
+  const imported = payload?.resumeData || payload || {};
+  const personalInfo = imported.personalInfo || {};
+  const nextState = {
+    name: sanitizeName(imported.name ?? personalInfo.name ?? ""),
+    email: imported.email ?? personalInfo.email ?? "",
+    phone: imported.phone ?? personalInfo.phone ?? "",
+    linkedin: imported.linkedin ?? personalInfo.linkedin ?? "",
+    city: imported.city ?? personalInfo.city ?? "",
+    summary: imported.summary ?? personalInfo.summary ?? "",
+    profileImage: imported.profileImage ?? personalInfo.profileImage ?? "",
+    technicalSkills: Array.isArray(imported.technicalSkills) ? imported.technicalSkills : [],
+    nonTechnicalSkills: Array.isArray(imported.nonTechnicalSkills) ? imported.nonTechnicalSkills : [],
+    achievements: Array.isArray(imported.achievements) ? imported.achievements : [],
+    interests: Array.isArray(imported.interests) ? imported.interests : [],
+  };
+
+  FORM_ARRAY_KEYS.forEach((key) => {
+    nextState[key] = Array.isArray(imported[key])
+      ? imported[key].map((item) => ({ ...item, id: item.id || createId() }))
+      : [];
+  });
+
+  return nextState;
+};
+
 // Form reducer function
 export const formReducer = (state, action) => {
   switch (action.type) {
+    case 'SET_FORM_DATA':
+      return normalizeImportedData(action.payload);
+
     // Basic info updates
     case 'UPDATE_BASIC_INFO':
       return {

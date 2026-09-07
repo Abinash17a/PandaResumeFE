@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 632 845" role="img" aria-labelledby="title desc">
+  <title id="title">Classic resume template preview</title>
+  <desc id="desc">A compact black and white resume with a centered name, contact details, and ruled section headings.</desc>
+  <rect width="632" height="845" fill="#fff"/>
+  <rect x="1" y="1" width="630" height="843" fill="none" stroke="#e5e7eb"/>
+  <g fill="#202124" font-family="Arial, sans-serif">
+    <text x="316" y="34" text-anchor="middle" font-size="22" font-weight="700">John Toe</text>
+    <text x="316" y="54" text-anchor="middle" font-size="7" fill="#444">johndoe@example.com    ·    (555) 123-4567    ·    linkedin.com/in/johndoe</text>
+    <g font-size="10" font-weight="700" letter-spacing="1">
+      <text x="22" y="94">PROFESSIONAL SUMMARY</text>
+      <text x="14" y="175">WORK EXPERIENCE</text>
+      <text x="14" y="318">PROJECTS</text>
+      <text x="14" y="506">EDUCATION</text>
+      <text x="14" y="575">CERTIFICATIONS</text>
+      <text x="14" y="632">NOTABLE ACHIEVEMENTS</text>
+      <text x="14" y="700">SKILLS</text>
+    </g>
+    <g stroke="#252525" stroke-width="1">
+      <line x1="22" y1="104" x2="615" y2="104" stroke="#d1d5db"/>
+      <line x1="14" y1="183" x2="622" y2="183"/>
+      <line x1="14" y1="326" x2="622" y2="326"/>
+      <line x1="14" y1="514" x2="622" y2="514"/>
+      <line x1="14" y1="583" x2="622" y2="583"/>
+      <line x1="14" y1="640" x2="622" y2="640"/>
+      <line x1="14" y1="708" x2="622" y2="708"/>
+    </g>
+    <g font-size="8" fill="#333">
+      <text x="22" y="125">Experienced software developer with 5+ years of expertise in full-stack development, specializing in</text>
+      <text x="22" y="138">React, Node.js, and cloud technologies. Passionate about building scalable applications and leading teams.</text>
+      <text x="14" y="199" font-weight="700">Senior Software Engineer</text><text x="145" y="199" font-size="6">at Tech Solutions Inc. · 2022-01-01 - Present · San Francisco, CA</text>
+      <text x="28" y="216">Lead development of enterprise web applications using React and Node.js. Mentored junior developers.</text>
+      <text x="14" y="250" font-weight="700">Full Stack Developer</text><text x="113" y="250" font-size="6">at Digital Innovations Ltd. · 2020-06-01 - 2021-12-31 · New York, NY</text>
+      <text x="28" y="267">Developed and maintained multiple client projects using modern JavaScript frameworks.</text>
+      <text x="14" y="343" font-weight="700">E-Commerce Platform</text>
+      <text x="28" y="359">Built a full-stack e-commerce platform with React, Node.js, and MongoDB.</text>
+      <text x="28" y="374">Technologies: React, Node.js, MongoDB, Stripe API, Redux</text>
+      <text x="28" y="389">Link: github.com/johndoe/ecommerce-platform</text>
+      <text x="14" y="416" font-weight="700">Task Management App</text>
+      <text x="28" y="432">Developed a real-time task management application with drag-and-drop functionality.</text>
+      <text x="28" y="447">Technologies: Vue.js, Express, Socket.io, PostgreSQL</text>
+      <text x="28" y="462">Link: taskmanager-demo.com</text>
+      <text x="14" y="532" font-weight="700">B.Tech in Computer Science</text><text x="160" y="532" font-size="6">University of Technology · 2016-08-01 - 2020-05-31 · Cambridge, MA</text>
+      <text x="28" y="549">Dean's List for 6 semesters, President of Coding Club</text>
+      <text x="28" y="601">AWS Certified Solutions Architect · Amazon Web Services</text>
+      <text x="28" y="616">React Developer Certification · Meta</text>
+      <text x="28" y="656">Employee of the Year 2023 at Tech Solutions Inc.</text>
+      <text x="28" y="671">Led team to win Best Innovation Award 2022</text>
+      <text x="14" y="726" font-size="7"><tspan font-weight="700">Technical Skills:</tspan> JavaScript, React, Node.js, Python, TypeScript, MongoDB, PostgreSQL, Docker, AWS</text>
+      <text x="14" y="744" font-size="7"><tspan font-weight="700">Languages:</tspan> English (Native), Spanish (Intermediate), French (Basic)</text>
+      <text x="14" y="762" font-size="7"><tspan font-weight="700">Professional Interests:</tspan> Machine Learning, Open Source Contribution, Technical Writing</text>
+    </g>
+  </g>
+</svg>

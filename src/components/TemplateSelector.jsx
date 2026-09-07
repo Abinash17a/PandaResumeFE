@@ -1,6 +1,10 @@
 'use client';
 
 import { CheckCircle2 } from 'lucide-react';
+import classicPreview from '../assets/templates/classic.png';
+import modernPreview from '../assets/templates/mordern.png';
+import minimalPreview from '../assets/templates/minimal.png';
+import blankCanvasPreview from '../assets/templates/Green.png';
 
 const INK = '#16233F';
 const ACCENT = '#B8862E';
@@ -13,18 +17,28 @@ const templates = [
     name: 'Classic',
     description: 'Clean, structured layout suited to traditional roles.',
     accent: '#B8862E',
+    preview: classicPreview,
   },
   {
     id: 'template2',
     name: 'Modern',
     description: 'Contemporary design with bolder section headings.',
     accent: '#3E6E8E',
+    preview: modernPreview,
   },
   {
     id: 'template3',
     name: 'Minimal',
     description: 'A refined, lightweight layout for polished and concise resumes.',
     accent: '#5A7C5A',
+    preview: minimalPreview,
+  },
+  {
+    id: 'template4',
+    name: 'Freeform',
+    description: 'A flexible foundation for creating your own resume style.',
+    accent: '#246B6B',
+    preview: blankCanvasPreview,
   },
 ];
 
@@ -41,36 +55,23 @@ export default function TemplateSelector({ template, setTemplate }) {
             role="radio"
             aria-checked={isSelected}
             onClick={() => setTemplate(tpl.id)}
-            className="text-left rounded-lg border-2 p-5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            className="text-left rounded-lg border-2 p-6 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{
               borderColor: isSelected ? ACCENT : LINE,
               backgroundColor: '#FFFFFF',
             }}
           >
-            <div className="flex items-start gap-5">
+            <div className="flex items-start gap-6">
               {/* Mini document preview */}
               <div
-                className="w-24 flex-shrink-0 rounded-md border p-3"
+                className="w-28 h-36 flex-shrink-0 overflow-hidden rounded-md border bg-white"
                 style={{ borderColor: LINE }}
               >
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className="h-4 w-4 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: '#EFE7D6' }}
-                  />
-                  <div className="flex-1 space-y-1">
-                    <div
-                      className="h-1 w-3/5 rounded-full"
-                      style={{ backgroundColor: tpl.accent }}
-                    />
-                    <div className="h-0.5 w-4/5 rounded-full" style={{ backgroundColor: LINE }} />
-                  </div>
-                </div>
-                <div className="mt-2 space-y-1">
-                  <div className="h-0.5 w-full rounded-full" style={{ backgroundColor: LINE }} />
-                  <div className="h-0.5 w-full rounded-full" style={{ backgroundColor: LINE }} />
-                  <div className="h-0.5 w-2/3 rounded-full" style={{ backgroundColor: LINE }} />
-                </div>
+                <img
+                  src={tpl.preview}
+                  alt={`${tpl.name} resume template preview`}
+                  className="h-full w-full object-cover object-top"
+                />
               </div>
 
               {/* Content */}

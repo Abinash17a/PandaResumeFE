@@ -23,6 +23,14 @@ html, body {
     print-color-adjust: exact;
   }
 
+  /* Print only the resume preview and preserve its HTML text. */
+  #resume-preview {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
   /* Prevent content from being cut off across page breaks */
   .break-inside-avoid-page {
     break-inside: avoid-page;

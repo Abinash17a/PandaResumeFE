@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import html2pdf from "html2pdf.js";
-import { Download, Loader2, FlaskConical, AlertTriangle, X } from "lucide-react";
+import html2canvas from "html2canvas";
+import { Download, Loader2, FlaskConical, AlertTriangle, X, Upload, Printer } from "lucide-react";
 import { useForm } from "../context/formHooks.js";
 import { populateDummyData } from "../utils/dummyData.js";
+import { extractResumeFromPdf } from "../utils/pdfResumeParser.js";
 
 // Import all section components
 import BasicInfoSection from "./FormSections/BasicInfoSection.jsx";
@@ -27,11 +29,69 @@ const SECTIONS = [
   { key: "interests", label: "Interests", Component: InterestsSection },
 ];
 
-export default function StructuredFormNew({ template, previewId = "resume-preview" }) {
+const convertOklchToRgb = (value) => {
+  const match = value.match(/oklch\(\s*([\d.]+%?)\s+([\d.]+%?)\s+([\d.]+)(?:deg)?(?:\s*\/\s*([\d.]+%?))?\s*\)/i);
+  if (!match) return value;
+
+  const lightness = parseFloat(match[1]) / (match[1].endsWith("%") ? 100 : 1);
+  const chroma = parseFloat(match[2]) * (match[2].endsWith("%") ? 0.004 : 1);
+  const hue = (parseFloat(match[3]) * Math.PI) / 180;
+  const alpha = match[4]
+    ? parseFloat(match[4]) / (match[4].endsWith("%") ? 100 : 1)
+    : 1;
+  const a = chroma * Math.cos(hue);
+  const b = chroma * Math.sin(hue);
+  const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (lightness - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  const toSrgb = (channel) => {
+    const value = 12.92 * channel <= 0.0031308
+      ? 12.92 * channel
+      : 1.055 * Math.max(channel, 0) ** (1 / 2.4) - 0.055;
+    return Math.round(Math.max(0, Math.min(1, value)) * 255);
+  };
+  const red = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+  const green = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+  const blue = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+
+  return alpha < 1
+    ? `rgba(${toSrgb(red)}, ${toSrgb(green)}, ${toSrgb(blue)}, ${alpha})`
+    : `rgb(${toSrgb(red)}, ${toSrgb(green)}, ${toSrgb(blue)})`;
+};
+
+const makeCanvasSafe = (document) => {
+  const properties = [
+    "color",
+    "backgroundColor",
+    "backgroundImage",
+    "borderTopColor",
+    "borderRightColor",
+    "borderBottomColor",
+    "borderLeftColor",
+    "outlineColor",
+    "textDecorationColor",
+    "boxShadow",
+    "fill",
+    "stroke",
+  ];
+
+  document.querySelectorAll("*").forEach((element) => {
+    const computedStyle = document.defaultView.getComputedStyle(element);
+    properties.forEach((property) => {
+      const value = computedStyle[property];
+      if (value?.includes("oklch")) {
+        element.style[property] = value.replace(/oklch\([^)]*\)/gi, convertOklchToRgb);
+      }
+    });
+  });
+};
+
+export default function StructuredFormNew({ template, previewId = "resume-preview", onBeforePrint, onBeforeDownload }) {
   const { state, dispatch } = useForm();
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
+  const importInputRef = useRef(null);
 
   // Development dummy data handler
   const handlePopulateDummyData = () => {
@@ -42,85 +102,98 @@ export default function StructuredFormNew({ template, previewId = "resume-previe
     dispatch({ type: 'RESET_FORM' });
   };
 
-  // Temporarily swap any unsupported color formats (e.g. oklch) for values
-  // html2canvas can render, and hand back a function that restores them.
-  const withPrintableColors = (root) => {
-    const patched = [];
+  const handleImportResume = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
 
-    root.querySelectorAll("*").forEach((el) => {
-      const style = window.getComputedStyle(el);
-      const original = { color: el.style.color, backgroundColor: el.style.backgroundColor, borderColor: el.style.borderColor };
-      let touched = false;
-
-      if (style.color?.includes("oklch")) {
-        el.style.color = "#000000";
-        touched = true;
-      }
-      if (style.backgroundColor?.includes("oklch")) {
-        el.style.backgroundColor = "#ffffff";
-        touched = true;
-      }
-      if (style.borderColor?.includes("oklch")) {
-        el.style.borderColor = "#e5e7eb";
-        touched = true;
-      }
-
-      if (touched) patched.push({ el, original });
-    });
-
-    return () => {
-      patched.forEach(({ el, original }) => {
-        el.style.color = original.color;
-        el.style.backgroundColor = original.backgroundColor;
-        el.style.borderColor = original.borderColor;
-      });
-    };
-  };
-
-  const downloadPDF = async () => {
-    const element = document.getElementById(previewId);
-    if (!element) {
-      setError("Resume preview not found. Please open the preview and try again.");
+    if (file.type !== "application/pdf") {
+      setError("Please choose a PDF resume.");
       return;
     }
 
+    try {
+      const importedData = await extractResumeFromPdf(file);
+      dispatch({ type: "SET_FORM_DATA", payload: importedData });
+      setError(null);
+    } catch (importError) {
+      console.error("Resume PDF import error:", importError);
+      setError("Couldn't read that PDF. Scanned or image-only PDFs need OCR before import.");
+    }
+  };
+
+  const downloadPDF = async () => {
     setError(null);
     setIsGenerating(true);
 
-    const restoreColors = withPrintableColors(element);
-
     try {
-      const opt = {
-        margin: 0,
-        filename: `${(state.name || "resume").replace(/\s+/g, "_")}.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: "#ffffff",
-          letterRendering: true,
-          allowTaint: false,
-          scrollX: 0,
-          scrollY: 0,
-          windowWidth: 1200,
-          windowHeight: 1600,
-        },
-        jsPDF: {
-          unit: "mm",
-          format: "a4",
-          orientation: "portrait",
-        },
-      };
+      const resumeElement = document.getElementById(previewId);
+      if (!resumeElement) {
+        if (onBeforeDownload) {
+          onBeforeDownload();
+          window.setTimeout(() => downloadPDF(), 100);
+          return;
+        }
+        throw new Error("Open the resume preview before downloading.");
+      }
 
-      await html2pdf().set(opt).from(element).save();
+      // Export a detached A4-width copy so editor zoom and responsive wrappers
+      // cannot change the document geometry captured by html2pdf.
+      const exportHost = document.createElement("div");
+      const exportElement = resumeElement.cloneNode(true);
+      const previewWidth = Math.round(resumeElement.getBoundingClientRect().width);
+      const exportWidth = Math.max(1, previewWidth);
+      const exportHeight = Math.round(exportWidth * (1124 / 795));
+      exportHost.style.cssText = `position: fixed; left: -10000px; top: 0; width: ${exportWidth}px; background: #fff;`;
+      exportElement.style.width = `${exportWidth}px`;
+      exportElement.style.maxWidth = `${exportWidth}px`;
+      exportElement.style.minHeight = `${exportHeight}px`;
+      exportElement.style.height = `${exportHeight}px`;
+      exportElement.style.overflow = "hidden";
+      exportElement.style.transform = "none";
+      document.body.appendChild(exportHost);
+      exportHost.appendChild(exportElement);
+
+      try {
+        const canvas = await html2canvas(exportElement, {
+          scale: 2,
+          width: exportWidth,
+          height: exportHeight,
+          windowWidth: exportWidth,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          onclone: makeCanvasSafe,
+        });
+        const pdf = await html2pdf()
+          .set({
+            margin: 0,
+            filename: `${(state.name || "resume").replace(/\s+/g, "_")}.pdf`,
+            image: { type: "jpeg", quality: 0.98 },
+            jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          })
+          .from(canvas)
+          .toPdf()
+          .get("pdf");
+        pdf.save(`${(state.name || "resume").replace(/\s+/g, "_")}.pdf`);
+      } finally {
+        exportHost.remove();
+      }
     } catch (err) {
       console.error("PDF generation error:", err);
       setError(`Couldn't generate the PDF: ${err.message || "please try again."}`);
     } finally {
-      restoreColors();
       setIsGenerating(false);
     }
+  };
+
+  const printPDF = () => {
+    setError(null);
+    if (onBeforePrint) {
+      onBeforePrint();
+      window.setTimeout(() => window.print(), 100);
+      return;
+    }
+    window.print();
   };
 
   return (
@@ -128,12 +201,34 @@ export default function StructuredFormNew({ template, previewId = "resume-previe
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-20 sm:pb-32">
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
-            Build your resume
-          </h2>
-          <p className="mt-1.5 text-sm text-slate-500">
-            Fill in each section below — your preview updates as you type.
-          </p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
+                Build your resume
+              </h2>
+              <p className="mt-1.5 text-sm text-slate-500">
+                Fill in each section below — your preview updates as you type.
+              </p>
+            </div>
+            <div>
+              <input
+                ref={importInputRef}
+                type="file"
+                accept="application/pdf,.pdf"
+                onChange={handleImportResume}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => importInputRef.current?.click()}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 sm:w-auto"
+              >
+                <Upload size={17} />
+                Import resume
+              </button>
+              <p className="mt-1 text-center text-[11px] text-slate-400 sm:text-right">PDF file</p>
+            </div>
+          </div>
         </div>
 
         {/* Development-only dummy data banner */}
@@ -192,13 +287,21 @@ export default function StructuredFormNew({ template, previewId = "resume-previe
       </div>
 
       {/* Floating mobile/download action */}
-      <div className="fixed bottom-4 right-4 z-50 sm:hidden">
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-3 sm:hidden">
+        <button
+          onClick={printPDF}
+          aria-label="Print or save PDF resume"
+          title="Print or save PDF resume"
+          className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-700 text-white shadow-lg transition hover:bg-slate-800"
+        >
+          <Printer size={20} />
+        </button>
         <button
           onClick={downloadPDF}
-          disabled={isGenerating}
+          disabled
           aria-label="Download PDF resume"
           title="Download PDF resume"
-          className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition disabled:cursor-not-allowed disabled:opacity-40"
         >
           {isGenerating ? (
             <Loader2 size={20} className="animate-spin" />
@@ -209,25 +312,34 @@ export default function StructuredFormNew({ template, previewId = "resume-previe
       </div>
 
       {/* Desktop download bar */}
-      <div className="hidden sm:block fixed bottom-0 inset-x-0 border-t border-slate-200 bg-slate-50/95 backdrop-blur-sm shadow-[0_-2px_10px_rgba(15,23,42,0.08)]">
+      <div className="fixed bottom-0 inset-x-0 z-40 hidden border-t border-slate-200 bg-slate-50/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm shadow-[0_-2px_10px_rgba(15,23,42,0.08)] sm:block print:hidden">
         <div className="max-w-4xl mx-auto px-3 sm:px-6 py-2.5 sm:py-4 flex justify-center">
-          <button
-            onClick={downloadPDF}
-            disabled={isGenerating}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-base font-semibold transition-colors"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 size={18} className="animate-spin" />
-                Generating PDF…
-              </>
-            ) : (
-              <>
-                <Download size={18} />
-                Download PDF resume
-              </>
-            )}
-          </button>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <button
+              onClick={printPDF}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 text-base font-semibold transition-colors"
+            >
+              <Printer size={18} />
+              Print / Save as PDF
+            </button>
+            <button
+              onClick={downloadPDF}
+              disabled
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg disabled:opacity-40 disabled:cursor-not-allowed text-base font-semibold transition-colors"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Generating PDF…
+                </>
+              ) : (
+                <>
+                  <Download size={18} />
+                  Download image PDF
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

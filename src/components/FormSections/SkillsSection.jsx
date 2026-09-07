@@ -59,7 +59,7 @@ export default function SkillsSection() {
 
       {/* Skill Input */}
       <div className="mb-6">
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <input
             placeholder="e.g. React, Python, Leadership, Project Management, Communication"
             value={currentSkill}
@@ -69,7 +69,7 @@ export default function SkillsSection() {
           />
           <button
             onClick={() => addSkill(currentSkill)}
-            className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold text-sm shadow-md shadow-blue-100 transition-all active:scale-95"
+            className="w-full px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold text-sm shadow-md shadow-blue-100 transition-all active:scale-95 sm:w-auto"
           >
             Add Skill
           </button>

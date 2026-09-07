@@ -25,6 +25,17 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
   // helpers to parse fields gracefully
   const parseList = (text) => {
     if (!text) return []
+    if (Array.isArray(text)) {
+      return text
+        .map((value) => {
+          if (typeof value === 'string') return value.trim();
+          if (!value) return '';
+          const label = value.name || value.language || value.label || value.title;
+          const proficiency = value.proficiency ? ` (${value.proficiency})` : '';
+          return label ? `${label}${proficiency}`.trim() : '';
+        })
+        .filter(Boolean);
+    }
     return String(text)
       .split(/[,;\n]/)
       .map((s) => s.trim())
@@ -60,16 +71,35 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
   };
 
   const formatAchievements = (text) => {
-    if (!text) return []
-    return text
+    if (Array.isArray(text)) {
+      return text
+        .map((achievement) => {
+          if (typeof achievement === 'string') return achievement.trim();
+          if (!achievement) return '';
+          return String(achievement.text || achievement.description || achievement.title || '').trim();
+        })
+        .filter(Boolean);
+    }
+    if (!text) return [];
+    return String(text)
       .split(/\n{2,}/)
       .map((block) => block.trim())
-      .filter(Boolean)
+      .filter(Boolean);
   }
 
-  const formatProjects = (text) => {
-    if (!text) return []
-    return text
+  const formatProjects = (projects) => {
+    if (Array.isArray(projects)) {
+      return projects
+        .filter((project) => project && (project.title || project.description || project.technologies || project.link))
+        .map((project) => ({
+          title: project.title || '',
+          bullets: project.description ? [project.description] : [],
+          technologies: project.technologies || '',
+          link: project.link || '',
+        }))
+    }
+    if (!projects) return []
+    return String(projects)
       .split(/\n{2,}/)
       .map((block) => {
         const lines = block
@@ -94,9 +124,17 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
   const experienceList = parseExperience(data.experiences);
   console.log("experience list",experienceList)
   const educationList = parseEducation(data.educationItems);
-  const certificationsList = data.certifications ? data.certifications.split("\n").filter(Boolean) : [];
+  const certificationsList = Array.isArray(data.certifications)
+    ? data.certifications.map((certification) => {
+        if (typeof certification === "string") return certification.trim();
+        if (!certification) return "";
+        return [certification.name, certification.issuer, certification.date]
+          .filter(Boolean)
+          .join(" - ");
+      }).filter(Boolean)
+    : data.certifications ? String(data.certifications).split("\n").filter(Boolean) : [];
   const achievementsList = formatAchievements(data.achievements);
-  const projectsList = formatProjects(data.projects || "");
+  const projectsList = formatProjects(data.projects);
 
   // Parse technical and non-technical skills separately
   const parseTechnicalSkills = (skills) => {
@@ -104,7 +142,11 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
     return parseList(skills);
   };
 
-  const technicalSkillsList = parseTechnicalSkills(data.skills);
+  const technicalSkillsList = [
+    ...parseTechnicalSkills(data.technicalSkills),
+    ...parseTechnicalSkills(data.nonTechnicalSkills),
+    ...parseTechnicalSkills(data.skills),
+  ];
 
   const containerStyle = {
     width: "100%",
@@ -113,7 +155,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
     padding: "8px 18px 10px",
     backgroundColor: "#ffffff",
     fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    fontSize: "clamp(9px, 2.5vw, 11px)",
+    fontSize: "10px",
     lineHeight: 1.45,
     color: "#333",
     boxShadow: "none",
@@ -138,8 +180,8 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
   }
 
   const profileImageStyle = {
-    width: "clamp(80px, 15vw, 120px)",
-    height: "clamp(80px, 15vw, 120px)",
+    width: "96px",
+    height: "96px",
     borderRadius: "8px",
     objectFit: "cover",
     border: "2px solid #1a1a1a",
@@ -148,7 +190,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
   const nameStyle = {
     margin: 0,
     color: "#1a1a1a",
-    fontSize: "clamp(18px, 5vw, 24pt)", // Responsive name size
+    fontSize: "22pt",
     letterSpacing: "0.5px",
     fontWeight: 700,
     marginBottom: "6px",
@@ -157,25 +199,25 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
 
   const contactStyle = {
     margin: "0",
-    fontSize: "clamp(8px, 2.5vw, 10pt)", // Responsive contact size
+    fontSize: "9pt",
     color: "#444",
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
-    gap: "clamp(2px, 0.5vw, 4px)",
+    gap: "4px",
     flexWrap: "wrap",
     maxWidth: "100%"
   }
 
   const sectionHeaderStyle = {
-    fontSize: "clamp(9px, 3vw, 11pt)",
+    fontSize: "10pt",
     fontWeight: 700,
     textTransform: "uppercase",
     letterSpacing: "1px",
     color: "#1a1a1a",
     marginTop: "4px",
-    marginBottom: "4px",
-    paddingBottom: "2px",
+    marginBottom: "6px",
+    paddingBottom: "4px",
     borderBottom: "1px solid #1a1a1a",
   }
 
@@ -184,7 +226,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
   }
 
   const jobTitleStyle = {
-    fontSize: "clamp(9px, 3vw, 11pt)", // Responsive job titles
+    fontSize: "10pt",
     fontWeight: 700,
     color: "#1a1a1a",
     marginBottom: "2px",
@@ -192,8 +234,8 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
 
   const bulletListStyle = {
     margin: "2px 0 0 0",
-    paddingLeft: "clamp(12px, 3vw, 16px)",
-    fontSize: "clamp(8px, 2.5vw, 10pt)",
+    paddingLeft: "16px",
+    fontSize: "9pt",
     lineHeight: 1.4,
   }
 
@@ -202,7 +244,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
   }
 
   const summaryStyle = {
-    fontSize: "clamp(8px, 2.5vw, 10pt)",
+    fontSize: "9pt",
     lineHeight: 1.4,
     color: "#333",
     textAlign: "left",
@@ -224,29 +266,32 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
     display: "inline",
   }
 
-  const mobileClampStyle = {
-    display: "-webkit-box",
-    WebkitLineClamp: 4,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  }
+  // const mobileClampStyle = {
+  //   display: "-webkit-box",
+  //   WebkitLineClamp: 4,
+  //   WebkitBoxOrient: "vertical",
+  //   overflow: "hidden",
+  //   textOverflow: "ellipsis",
+  // }
 
-  const mobileProjectTitleStyle = {
-    ...jobTitleStyle,
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  }
+  // const mobileProjectTitleStyle = {
+  //   ...jobTitleStyle,
+  //   display: "-webkit-box",
+  //   WebkitLineClamp: 2,
+  //   WebkitBoxOrient: "vertical",
+  //   overflow: "hidden",
+  //   textOverflow: "ellipsis",
+  // }
+
+  const linkedin = String(data.linkedin || '').replace(/\s+/g, '');
+  const linkedinHref = linkedin && (/^https?:\/\//i.test(linkedin) ? linkedin : `https://${linkedin}`);
 
   return (
     <div
       id={previewId}
       role="document"
       style={containerStyle}
-      className={`w-full max-w-4xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-3 sm:py-4 md:py-5 lg:py-6 ${lineHeight} ${letterSpacing} text-gray-800 print:px-6 print:py-4 print:max-w-none print:shadow-none print:rounded-none`}
+      className={`w-full max-w-4xl mx-auto px-6 py-4 ${lineHeight} ${letterSpacing} text-gray-800 print:max-w-none print:shadow-none print:rounded-none`}
     >
       {/* ATS-friendly hidden content */}
       <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }} aria-hidden="true">
@@ -306,7 +351,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
             )}
             {data.email && (
               <span style={{ marginRight: '8px', marginBottom: '2px' }}>
-                {data.email}
+                {String(data.email).replace(/\s+/g, '')}
               </span>
             )}
             {data.phone && (
@@ -315,9 +360,9 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
               </span>
             )}
             {data.linkedin && (
-              <span>
-                {data.linkedin}
-              </span>
+              <a href={linkedinHref} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+                {linkedin}
+              </a>
             )}
           </div>
         </div>
@@ -406,7 +451,7 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
         <section aria-label="projects">
           <h2 style={sectionHeaderStyle}>PROJECTS</h2>
           {projectsList.map((project, i) => (
-            <div key={`project-${i}`} style={subsectionStyle}>
+            <div key={`project-${i}`} style={{ ...subsectionStyle, marginBottom: '10px' }}>
               <div style={jobTitleStyle}>{project.title}</div>
               {project.bullets.length > 0 && (
                 <ul style={bulletListStyle}>
@@ -419,6 +464,16 @@ export default function Template1({ data = {}, fontSizeConfig = {}, spacingConfi
                     </li>
                   ))}
                 </ul>
+              )}
+              {project.technologies && (
+                <div style={{ fontSize: '9pt', marginTop: '2px' }}>
+                  <strong>Technologies:</strong> {project.technologies}
+                </div>
+              )}
+              {project.link && (
+                <div style={{ fontSize: '9pt', marginTop: '2px' }}>
+                  <strong>Link:</strong> {project.link}
+                </div>
               )}
             </div>
           ))}
